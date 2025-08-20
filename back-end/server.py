@@ -89,7 +89,7 @@ async def main():
                     rate=RATE,
                     input=True,
                     frames_per_buffer=CHUNK,
-                    input_device_index=1)
+                    input_device_index=2)
     
     stream.start_stream()
     print("Audio stream started.")
