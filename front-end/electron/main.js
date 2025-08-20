@@ -43,7 +43,7 @@ const startPythonServer = () => {
 	const pythonExecutable = process.platform === "win32" ? "python.exe" : "python";
 
 	// Path to your server.py file. Adjust if your directory structure changes.
-	const pythonScriptPath = path.join(__dirname, "..", "back-end", "server.py");
+	const pythonScriptPath = path.join(__dirname, "..","..", "back-end", "server.py");
 
 	// Spawn the Python process.
 	pythonProcess = spawn(pythonExecutable, [pythonScriptPath]);

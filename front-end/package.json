@@ -18,7 +18,7 @@
     "productName": "MyVisualizer",
     "files": [
         "dist/**/*",
-        "main.js",
+        "electron/**/*",
         "../back-end/server.py"
     ],
     "asar": false,
