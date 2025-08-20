@@ -3,13 +3,30 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"npm run electron\"",
+    "package": "npm run build && electron-builder --win"
   },
-  "dependencies": {
+  "build": {
+    "appId": "com.yourname.myvisualizer",
+    "productName": "MyVisualizer",
+    "files": [
+        "dist/**/*",
+        "main.js",
+        "../back-end/server.py"
+    ],
+    "asar": false,
+    "win": {
+        "target": "nsis"
+    }
+}, 
+    "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "lucide-react": "^0.539.0",
     "react": "^19.1.1",
@@ -21,6 +38,9 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.0",
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

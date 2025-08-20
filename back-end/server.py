@@ -10,17 +10,17 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
-# Beat and rhythm detection variables
-BEAT_VELOCITY_THRESHOLD = 5000
+# Drum kick and rhythm detection variables
+DRUM_KICK_VELOCITY_THRESHOLD = 5000
 last_bass_energy = 0
-last_beat_trigger = 0
+last_drum_kick_trigger = 0
 
 async def audio_processor(websocket, stream):
     """
     This function processes the audio and sends the data over the WebSocket.
     It runs the blocking stream.read() call in a separate thread.
     """
-    global last_bass_energy, last_beat_trigger
+    global last_bass_energy, last_drum_kick_trigger
     print(f"WebSocket client connected!")
     loop = asyncio.get_event_loop()
 
@@ -46,16 +46,17 @@ async def audio_processor(websocket, stream):
             bass_velocity = bass_energy - last_bass_energy
             last_bass_energy = bass_energy
             
-            is_beat = False
+            is_drum_kick = False
             current_time_ms = asyncio.get_event_loop().time() * 1000
-            if bass_velocity > BEAT_VELOCITY_THRESHOLD and current_time_ms - last_beat_trigger > 200:
-                is_beat = True
-                last_beat_trigger = current_time_ms
+            # Check for a rapid increase in low-frequency energy (a drum kick)
+            if bass_velocity > DRUM_KICK_VELOCITY_THRESHOLD and current_time_ms - last_drum_kick_trigger > 200:
+                is_drum_kick = True
+                last_drum_kick_trigger = current_time_ms
 
             normalized_mids = min(mids_energy / 10000, 1)
 
             audio_data = {
-                "is_beat": is_beat,
+                "is_drum_kick": is_drum_kick,
                 "rhythm_factor": normalized_mids
             }
             

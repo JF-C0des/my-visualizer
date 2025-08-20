@@ -1,15 +1,26 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { RefreshCcw, SlidersHorizontal, Sun, Moon, Play, Pause } from "lucide-react";
 
+// Neon color palette
+const NEON_COLORS = [
+	"rgba(255, 0, 255, 1)", // Neon Pink/Magenta
+	"rgba(0, 255, 255, 1)", // Neon Cyan
+	"rgba(255, 255, 0, 1)", // Neon Yellow
+	"rgba(57, 255, 20, 1)", // Neon Green
+	"rgba(0, 191, 255, 1)", // Neon Blue
+	"rgba(255, 105, 180, 1)", // Hot Pink
+	"rgba(255, 140, 0, 1)", // Dark Orange (as a bright color)
+];
+
 // This is a simple class to represent an individual shape
-const Shape = function (x, y) {
-	this.x = x;
-	this.y = y;
+const Shape = function (width, height) {
+	// The constructor now takes width and height to generate random coordinates.
+	this.x = Math.random() * width;
+	this.y = Math.random() * height;
 	this.radius = 30;
 	this.numVertices = Math.floor(Math.random() * 8) + 3;
-	this.color = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
-		Math.random() * 255
-	)}, ${Math.floor(Math.random() * 255)}, 1)`;
+	// Use a random color from the neon palette
+	this.color = NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)];
 	this.lifespan = 255;
 };
 
@@ -34,9 +45,7 @@ const App = () => {
 	const settingsRef = useRef(settings);
 	settingsRef.current = settings;
 
-	// --- FIX 1: Buat ref baru untuk canvasDimensions ---
 	const canvasDimensionsRef = useRef(canvasDimensions);
-	// --- FIX 2: Selalu update ref dengan state terbaru setiap render ---
 	canvasDimensionsRef.current = canvasDimensions;
 
 	// --- WebSocket Connection Logic ---
@@ -73,15 +82,14 @@ const App = () => {
 				try {
 					const data = JSON.parse(event.data);
 					const currentSettings = settingsRef.current;
-					// --- FIX 3: Gunakan nilai dari ref, bukan dari state langsung ---
 					const currentDimensions = canvasDimensionsRef.current;
 
 					setShapes((prevShapes) => {
 						let newShapes = [...prevShapes];
 
-						if (data.is_beat) {
-							// Gunakan currentDimensions untuk posisi tengah yang benar
-							newShapes.push(new Shape(currentDimensions.width / 2, currentDimensions.height / 2));
+						if (data.is_drum_kick) {
+							// Pass canvas dimensions to the Shape constructor
+							newShapes.push(new Shape(currentDimensions.width, currentDimensions.height));
 							if (newShapes.length > currentSettings.maxShapes) {
 								newShapes = newShapes.slice(-currentSettings.maxShapes);
 							}
@@ -144,6 +152,7 @@ const App = () => {
 
 			const [r, g, b] = shape.color.match(/\d+/g).map(Number);
 			ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${shape.lifespan / 255})`;
+			ctx.lineWidth = 5;
 			ctx.stroke();
 		});
 
@@ -182,10 +191,17 @@ const App = () => {
 	const handleReset = () => setShapes([]);
 
 	return (
-		<div
-			className={`flex flex-col items-center justify-center min-h-screen p-4 font-sans transition-colors duration-500 ${
-				isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-900"
-			}`}>
+		<div className={`w-full h-screen font-sans transition-colors duration-500 relative ${isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-900"}`}>
+			{/* Canvas for Visualizer */}
+			<div className="absolute inset-0 z-0">
+				<canvas
+					ref={canvasRef}
+					width={canvasDimensions.width}
+					height={canvasDimensions.height}
+					className="absolute top-0 left-0 w-full h-full"
+				/>
+			</div>
+
 			{/* UI Controls: Play, Pause, Reset, Dark Mode, Settings */}
 			<div className="absolute top-4 left-4 z-10 flex space-x-2">
 				<button
@@ -251,20 +267,10 @@ const App = () => {
 					</div>
 				</div>
 			</div>
-
-			{/* Canvas for Visualizer */}
-			<div className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-3xl shadow-2xl border-2 border-white">
-				<canvas
-					ref={canvasRef}
-					width={canvasDimensions.width}
-					height={canvasDimensions.height}
-					className="absolute top-0 left-0 w-full h-full"
-				/>
-			</div>
-
-			{/* Status Info */}
+			
+			{/* Status Info (now absolutely positioned) */}
 			<div
-				className={`mt-8 w-full max-w-xl rounded-2xl shadow-xl p-6 transition-colors duration-300 ${
+				className={`absolute bottom-4 left-4 z-10 w-full max-w-sm rounded-2xl shadow-xl p-6 transition-colors duration-300 ${
 					isDarkMode
 						? "bg-gray-800 border-gray-700 text-gray-100"
 						: "bg-white border-gray-200 text-gray-900"
