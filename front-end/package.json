@@ -17,10 +17,10 @@
     "appId": "com.yourname.myvisualizer",
     "productName": "MyVisualizer",
     "files": [
-        "dist/**/*",
-        "electron/**/*",
-        "../back-end/server.py"
-    ],
+    "dist/**/*",
+    "electron/**/*",
+    "../back-end/**/*"
+],
     "asar": false,
     "win": {
         "target": "nsis"

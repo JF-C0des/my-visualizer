@@ -40,13 +40,16 @@ const createWindow = () => {
 // This function spawns the Python backend process.
 const startPythonServer = () => {
 	// Determine the path to the Python executable.
-	const pythonExecutable = process.platform === "win32" ? "python.exe" : "python";
-
-	// Path to your server.py file. Adjust if your directory structure changes.
-	const pythonScriptPath = path.join(__dirname, "..","..", "back-end", "server.py");
+	const pythonServerExecutable = path.join(
+		__dirname,
+		"..",
+		"..",
+		"back-end",
+		"server.exe"
+	);
 
 	// Spawn the Python process.
-	pythonProcess = spawn(pythonExecutable, [pythonScriptPath]);
+	pythonProcess = spawn(pythonServerExecutable);
 
 	// Log output from the Python process for debugging.
 	pythonProcess.stdout.on("data", (data) => {
