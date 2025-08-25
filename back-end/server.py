@@ -99,12 +99,7 @@ async def main():
         await audio_processor(websocket, stream)
 
     try:
-        async def process_request(path, request):
-            if "Upgrade" not in request.headers:
-                return (426, [("Content-Type", "text/plain")], b"WebSocket endpoint.\n")
-            return None
-
-        async with websockets.serve(handler, "localhost", 8766, process_request=process_request):
+        async with websockets.serve(handler, "localhost", 8766):
             print("Server started on ws://localhost:8766")
             await asyncio.Future()
     finally:
